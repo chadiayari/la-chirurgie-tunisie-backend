@@ -1,0 +1,15 @@
+# robots.txt for SM Medical Tunisie
+# https://la-chirurgie-tunisie.com
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://la-chirurgie-tunisie.com/sitemap.xml
+
+# Crawl-delay for polite crawling
+Crawl-delay: 1
+
+# Disallow admin or private paths (add as needed)
+Disallow: /api/
+Disallow: /admin/
