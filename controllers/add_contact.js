@@ -4,24 +4,37 @@ const { validationResult } = require("express-validator");
 const addcontact = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ success: false, errors: errors.array() });
+    return res.status(400).json({ 
+      success: false, 
+      message: "Tous les champs requis doivent être remplis",
+      errors: errors.array() 
+    });
   }
 
   try {
-    const data = req.body;
+    const { name, phone, intervention, message } = req.body;
 
     const contact = new Contact({
-      name: data.name,
-      phone: data.phone,
-      intervention: data.intervention,
-      message: data.message,
+      name,
+      phone,
+      intervention,
+      message,
+      status: "new",
     });
+    
     await contact.save();
 
-    res.status(200).json({ success: true, message: "Contact form data saved successfully" });
+    res.status(201).json({ 
+      success: true, 
+      message: "Contact créé avec succès",
+      data: contact 
+    });
   } catch (error) {
     console.error("Error saving contact form data:", error);
-    res.status(500).json({ success: false, message: "Error saving contact form data" });
+    res.status(500).json({ 
+      success: false, 
+      message: "Erreur serveur" 
+    });
   }
 };
 

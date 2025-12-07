@@ -21,7 +21,7 @@ app.use(cookieParser());
 
 // API routes
 app.use("/contact", contactRouter);
-app.use("/api/contact", contactRouter);
+app.use("/api/contacts", contactRouter);
 app.use("/api/newsletter", newsletterRouter);
 app.use("/api/auth", authRouter);
 

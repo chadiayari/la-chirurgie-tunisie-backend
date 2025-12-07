@@ -1,46 +1,63 @@
-//contollers/authController.js
 const jwt = require("jsonwebtoken");
 const Admin = require("../Models/admins.Model");
-const createError = require("http-errors");
 
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: "7d",
-  });
-};
+const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 
-const loginAdmin = async (req, res, next) => {
+const loginAdmin = async (req, res) => {
   try {
     const { username, password } = req.body;
 
+    // Find admin
     const admin = await Admin.findOne({ username });
-
     if (!admin) {
-      return next(createError(401, "Invalid credentials"));
+      return res.status(401).json({
+        success: false,
+        message: "Identifiants incorrects",
+      });
     }
 
-    const isMatch = password === admin.password;
-
+    // Check password using bcrypt compare method
+    const isMatch = await admin.comparePassword(password);
     if (!isMatch) {
-      return next(createError(401, "Invalid credentials"));
+      return res.status(401).json({
+        success: false,
+        message: "Identifiants incorrects",
+      });
     }
 
-    const token = generateToken(admin._id);
+    // Generate token
+    const token = jwt.sign(
+      { id: admin._id, username: admin.username, role: admin.role },
+      JWT_SECRET,
+      { expiresIn: "7d" }
+    );
 
     res.json({
-      _id: admin._id,
-      username: admin.username,
-      token: token,
       success: true,
+      message: "Connexion réussie",
+      token,
+      username: admin.username,
+      role: admin.role,
     });
   } catch (error) {
-    console.error("Login error:", error);
-    next(error);
+    console.error("Admin login error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Erreur serveur",
+    });
   }
 };
 
 const verifyToken = async (req, res) => {
-  res.json({ valid: true });
+  // req.user is set by authenticate middleware
+  res.json({
+    valid: true,
+    user: {
+      id: req.user.id,
+      username: req.user.username,
+      role: req.user.role,
+    },
+  });
 };
 
 module.exports = {

@@ -1,35 +1,45 @@
 const jwt = require("jsonwebtoken");
 const Admin = require("../Models/admins.Model");
-const createError = require("http-errors");
 
-const protect = async (req, res, next) => {
-  let token;
+const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer")
-  ) {
-    try {
-      token = req.headers.authorization.split(" ")[1];
-
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-      req.admin = await Admin.findById(decoded.id).select("-password");
-
-      if (!req.admin) {
-        return next(createError(401, "Not authorized"));
-      }
-
-      next();
-    } catch (error) {
-      console.error(error);
-      return next(createError(401, "Not authorized, token failed"));
-    }
-  }
+const authenticate = async (req, res, next) => {
+  const token = req.headers.authorization?.split(" ")[1];
 
   if (!token) {
-    return next(createError(401, "Not authorized, no token"));
+    return res.status(401).json({
+      valid: false,
+      message: "Token manquant",
+    });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    
+    // Attach user info to request
+    req.user = decoded;
+    
+    // Optionally verify admin still exists
+    const admin = await Admin.findById(decoded.id).select("-password");
+    if (!admin) {
+      return res.status(401).json({
+        valid: false,
+        message: "Utilisateur non trouvé",
+      });
+    }
+    
+    req.admin = admin;
+    next();
+  } catch (error) {
+    console.error("Auth error:", error);
+    return res.status(401).json({
+      valid: false,
+      message: "Token invalide",
+    });
   }
 };
 
-module.exports = { protect };
+// Alias for backward compatibility
+const protect = authenticate;
+
+module.exports = { authenticate, protect };
