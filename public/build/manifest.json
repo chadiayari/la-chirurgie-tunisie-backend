@@ -1,0 +1,19 @@
+{
+    "name": "SM Medical Tunisie",
+    "short_name": "SM Medical",
+    "description": "Chirurgie Esthétique & Tourisme Médical de Luxe en Tunisie",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0a0a0a",
+    "theme_color": "#D4AF37",
+    "orientation": "portrait-primary",
+    "lang": "fr",
+    "icons": [
+        {
+            "src": "/logo-gold.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any"
+        }
+    ]
+}
