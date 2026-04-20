@@ -4,7 +4,7 @@ const axios = require("axios");
 
 const sendEmailNotification = async (contactData) => {
   const API_KEY = process.env.BREVO_API_KEY;
-  const RECIPIENT_EMAIL = "salmamallek89@gmail.com";
+  const RECIPIENT_EMAIL = "sm.medical.tn@gmail.com";
 
   const emailData = {
     sender: {
