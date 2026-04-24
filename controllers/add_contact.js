@@ -47,6 +47,10 @@ const sendEmailNotification = async (contactData) => {
                         <td style="color: #162832; font-weight: bold;">Téléphone:</td>
                         <td style="color: #162832;">${contactData.phone}</td>
                       </tr>
+                      <tr>
+                        <td style="color: #162832; font-weight: bold;">Email:</td>
+                        <td style="color: #162832;">${contactData.email}</td>
+                      </tr>
                       <tr style="background-color: #f9f9f9;">
                         <td style="color: #162832; font-weight: bold;">Intervention:</td>
                         <td style="color: #162832;">${contactData.intervention || "Non spécifiée"}</td>
@@ -123,11 +127,12 @@ const addcontact = async (req, res) => {
   }
 
   try {
-    const { name, phone, intervention, message } = req.body;
+    const { name, phone, email, intervention, message } = req.body;
 
     const contact = new Contact({
       name,
       phone,
+      email,
       intervention,
       message,
       status: "new",
@@ -137,7 +142,13 @@ const addcontact = async (req, res) => {
 
     // Send email notification
     try {
-      await sendEmailNotification({ name, phone, intervention, message });
+      await sendEmailNotification({
+        name,
+        phone,
+        email,
+        intervention,
+        message,
+      });
       console.log("Email notification sent successfully");
     } catch (emailError) {
       console.error("Error sending email notification:", emailError);

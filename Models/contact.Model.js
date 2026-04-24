@@ -16,6 +16,10 @@ const contactSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    email: {
+      type: String,
+      required: true,
+    },
     message: {
       type: String,
       trim: true,
@@ -28,7 +32,7 @@ const contactSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const Contact = mongoose.model("Contact", contactSchema);

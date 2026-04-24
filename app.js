@@ -47,7 +47,7 @@ app.use(
         res.setHeader("Content-Type", "font/woff");
       }
     },
-  })
+  }),
 );
 
 // Special asset handling for specific routes
@@ -62,7 +62,7 @@ routesWithAssets.forEach((route) => {
           console.error(`Error serving asset at ${req.path}:`, err);
           res.status(404).send("Asset not found");
         }
-      }
+      },
     );
   });
 });
@@ -78,7 +78,7 @@ app.get("/*/*/assets/*", (req, res) => {
         console.error(`Error serving asset at ${req.path}:`, err);
         res.status(404).send("Asset not found");
       }
-    }
+    },
   );
 });
 
@@ -92,7 +92,7 @@ app.get("*", (req, res) => {
         console.error(`Error serving index.html: ${err}`);
         res.status(500).send("Server error");
       }
-    }
+    },
   );
 });
 
@@ -106,7 +106,7 @@ app.use((err, req, res, next) => {
 });
 
 connectDB();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 3500;
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
