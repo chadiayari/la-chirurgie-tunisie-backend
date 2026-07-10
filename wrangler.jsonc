@@ -3,7 +3,7 @@
   "main": "app.js",
   "compatibility_date": "2026-07-10",
   "compatibility_flags": ["nodejs_compat"],
-  "account_id": "CHANGE_ME",
+  "account_id": "07e88232759f3cfeed77cd31dcb69a20",
   "d1_databases": [
     {
       "binding": "DB",
