@@ -1,10 +1,10 @@
-const express = require("express");
-const router = express.Router();
-const { loginAdmin, verifyToken } = require("../controllers/authController");
-const { authenticate } = require("./authMiddleware");
+import { Hono } from "hono";
+import { loginAdmin, verifyToken } from "../controllers/authController.js";
+import { authenticate } from "./authMiddleware.js";
+
+const router = new Hono();
 
 router.post("/login", loginAdmin);
-
 router.get("/verify", authenticate, verifyToken);
 
-module.exports = router;
+export default router;

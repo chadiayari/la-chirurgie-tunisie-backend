@@ -1,23 +1,24 @@
 {
-  "dependencies": {
-    "@aws-sdk/client-s3": "^3.787.0",
-    "@aws-sdk/credential-providers": "^3.787.0",
-    "@aws-sdk/s3-request-presigner": "^3.787.0",
-    "axios": "^1.12.2",
-    "bcrypt": "^5.1.1",
-    "compression": "^1.8.0",
-    "cookie-parser": "^1.4.7",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.7",
-    "express": "^4.21.2",
-    "express-validator": "^7.2.1",
-    "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.10.1",
-    "morgan": "^1.10.0",
-    "multer": "^1.4.5-lts.2"
-  },
+  "name": "la-chirurgie-tunisie-backend",
+  "version": "1.0.0",
+  "description": "Backend for La Chirurgie Tunisie",
+  "type": "module",
+  "main": "app.js",
   "scripts": {
-    "start": "node app.js",
-    "build": "npm install"
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "build": "npm install",
+    "migrate:export": "node scripts/migrate-to-d1.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "hono": "^4.12.14",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "dotenv": "^16.4.7",
+    "mongoose": "^8.10.1",
+    "wrangler": "^4.0.0"
   }
 }

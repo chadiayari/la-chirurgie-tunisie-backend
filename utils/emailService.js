@@ -1,9 +1,5 @@
-const Contact = require("../Models/contact.Model");
-const { validationResult } = require("express-validator");
-const axios = require("axios");
-
-const sendEmailNotification = async (contactData) => {
-  const API_KEY = process.env.BREVO_API_KEY;
+export async function sendEmailNotification(contactData, env) {
+  const API_KEY = env.BREVO_API_KEY;
   const RECIPIENT_EMAIL = "sm.medical.tn@gmail.com";
 
   const emailData = {
@@ -36,7 +32,7 @@ const sendEmailNotification = async (contactData) => {
                 <tr>
                   <td style="padding: 30px;">
                     <p style="color: #162832; font-size: 16px; margin: 0 0 20px 0;">Vous avez reçu un nouveau message de contact sur votre site web.</p>
-                    
+
                     <h3 style="color: #e99c79; font-size: 18px; margin: 0 0 15px 0; border-bottom: 2px solid #e99c79; padding-bottom: 10px;">Détails du contact</h3>
                     <table width="100%" cellpadding="8" cellspacing="0" style="margin-bottom: 25px;">
                       <tr style="background-color: #f9f9f9;">
@@ -56,7 +52,7 @@ const sendEmailNotification = async (contactData) => {
                         <td style="color: #162832;">${contactData.intervention || "Non spécifiée"}</td>
                       </tr>
                     </table>
-                    
+
                     <h3 style="color: #e99c79; font-size: 18px; margin: 0 0 15px 0; border-bottom: 2px solid #e99c79; padding-bottom: 10px;">Message</h3>
                     <div style="background-color: #f9f9f9; padding: 20px; border-radius: 5px; border-left: 4px solid #e99c79;">
                       <p style="color: #162832; margin: 0; line-height: 1.6;">${contactData.message || "Aucun message"}</p>
@@ -89,84 +85,20 @@ ${contactData.message || "Aucun message"}
 Ce message a été envoyé automatiquement depuis votre site web.`,
   };
 
-  console.log("Attempting to send email notification:", {
-    to: emailData.to,
-    sender: emailData.sender,
-    subject: emailData.subject,
-  });
-
-  const response = await axios({
-    method: "post",
-    url: "https://api.brevo.com/v3/smtp/email",
+  const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+    method: "POST",
     headers: {
       accept: "application/json",
       "api-key": API_KEY,
       "content-type": "application/json",
     },
-    data: emailData,
-    validateStatus: () => true,
+    body: JSON.stringify(emailData),
   });
 
-  if (response.status >= 200 && response.status < 300) {
-    console.log("Email notification sent successfully");
-    return response.data;
-  } else {
-    console.error(`API returned status code ${response.status}`);
-    throw new Error(`Brevo API error: ${JSON.stringify(response.data)}`);
-  }
-};
-
-const addcontact = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({
-      success: false,
-      message: "Tous les champs requis doivent être remplis",
-      errors: errors.array(),
-    });
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(`Brevo API error (${response.status}): ${errorBody}`);
   }
 
-  try {
-    const { name, phone, email, intervention, message } = req.body;
-
-    const contact = new Contact({
-      name,
-      phone,
-      email,
-      intervention,
-      message,
-      status: "new",
-    });
-
-    await contact.save();
-
-    // Send email notification
-    try {
-      await sendEmailNotification({
-        name,
-        phone,
-        email,
-        intervention,
-        message,
-      });
-      console.log("Email notification sent successfully");
-    } catch (emailError) {
-      console.error("Error sending email notification:", emailError);
-      // Don't fail the request if email fails, just log it
-    }
-
-    res.status(201).json({
-      success: true,
-      message: "Contact créé avec succès",
-      data: contact,
-    });
-  } catch (error) {
-    console.error("Error saving contact form data:", error);
-    res.status(500).json({
-      success: false,
-      message: "Erreur serveur",
-    });
-  }
-};
-
-module.exports = { addcontact };
+  return response.json();
+}

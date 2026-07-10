@@ -1,15 +1,19 @@
-const express = require("express");
-const router = express.Router();
-const {
+import { Hono } from "hono";
+import {
   subscribeNewsletter,
   getSubscribers,
   unsubscribe,
-} = require("../controllers/newsletter_controller");
+} from "../controllers/newsletterController.js";
+import { validateNewsletter } from "../validators/newsletterValidator.js";
+import { authenticate } from "../middleware/authMiddleware.js";
 
-router.post("/", subscribeNewsletter);
+const router = new Hono();
 
-router.get("/", getSubscribers);
+// Public route - no authentication required
+router.post("/", validateNewsletter, subscribeNewsletter);
 
-router.delete("/:id", unsubscribe);
+// Protected routes - authentication required
+router.get("/", authenticate, getSubscribers);
+router.delete("/:id", authenticate, unsubscribe);
 
-module.exports = router;
+export default router;

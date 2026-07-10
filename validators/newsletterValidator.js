@@ -1,13 +1,19 @@
-const { body } = require("express-validator");
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-const newsletterValidationRules = [
-    body("email")
-        .isEmail()
-        .withMessage("Please provide a valid email address"),
-    body("name")
-        .optional()
-        .isString()
-        .withMessage("Name must be a string"),
-];
+export const validateNewsletter = async (c, next) => {
+  const body = await c.req.json().catch(() => ({}));
+  const errors = [];
 
-module.exports = newsletterValidationRules;
+  if (!body.email || !EMAIL_REGEX.test(body.email)) {
+    errors.push({ path: "email", msg: "Please provide a valid email address" });
+  }
+  if (body.name !== undefined && typeof body.name !== "string") {
+    errors.push({ path: "name", msg: "Name must be a string" });
+  }
+
+  if (errors.length) {
+    return c.json({ errors }, 400);
+  }
+
+  await next();
+};

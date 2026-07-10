@@ -1,10 +1,24 @@
-const { check } = require("express-validator");
+export const validateContact = async (c, next) => {
+  const body = await c.req.json().catch(() => ({}));
+  const errors = [];
 
-const validateContact = [
-  check("name").notEmpty().withMessage("Name is required"),
-  check("phone").notEmpty().withMessage("Phone number is required"),
-  check("intervention").optional(),
-  check("message").optional(),
-];
+  if (!body.name || typeof body.name !== "string" || !body.name.trim()) {
+    errors.push({ path: "name", msg: "Name is required" });
+  }
+  if (!body.phone || typeof body.phone !== "string" || !body.phone.trim()) {
+    errors.push({ path: "phone", msg: "Phone number is required" });
+  }
 
-module.exports = validateContact;
+  if (errors.length) {
+    return c.json(
+      {
+        success: false,
+        message: "Tous les champs requis doivent être remplis",
+        errors,
+      },
+      400,
+    );
+  }
+
+  await next();
+};

@@ -1,18 +1,21 @@
-const express = require("express");
-const router = express.Router();
-const { addcontact } = require("../controllers/add_contact.js");
-const { contactget } = require("../controllers/get_contact.js");
-const { deleteContact } = require("../controllers/deleteContact.js");
-const { updateContact } = require("../controllers/update_contact.js");
-const validateContact = require("../validators/contactValidators.js");
-const { authenticate } = require("../middleware/authMiddleware.js");
+import { Hono } from "hono";
+import {
+  addContact,
+  getContacts,
+  updateContact,
+  deleteContact,
+} from "../controllers/contactController.js";
+import { validateContact } from "../validators/contactValidators.js";
+import { authenticate } from "../middleware/authMiddleware.js";
+
+const router = new Hono();
 
 // Public route - no authentication required
-router.post("/", validateContact, addcontact);
+router.post("/", validateContact, addContact);
 
 // Protected routes - authentication required
-router.get("/", authenticate, contactget);
+router.get("/", authenticate, getContacts);
 router.patch("/:id", authenticate, updateContact);
 router.delete("/:id", authenticate, deleteContact);
 
-module.exports = router;
+export default router;

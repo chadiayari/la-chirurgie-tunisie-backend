@@ -1,38 +1,38 @@
-const jwt = require("jsonwebtoken");
-const Admin = require("../Models/admins.Model");
+import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
 
-const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
-
-const loginAdmin = async (req, res) => {
+export const loginAdmin = async (c) => {
   try {
-    const { username, password } = req.body;
+    const { username, password } = await c.req.json();
 
-    // Find admin
-    const admin = await Admin.findOne({ username });
+    const admin = await c.env.DB.prepare(
+      "SELECT * FROM admins WHERE username = ?",
+    )
+      .bind(username)
+      .first();
+
     if (!admin) {
-      return res.status(401).json({
-        success: false,
-        message: "Identifiants incorrects",
-      });
+      return c.json(
+        { success: false, message: "Identifiants incorrects" },
+        401,
+      );
     }
 
-    // Check password using bcrypt compare method
-    const isMatch = await admin.comparePassword(password);
+    const isMatch = await bcrypt.compare(password, admin.password);
     if (!isMatch) {
-      return res.status(401).json({
-        success: false,
-        message: "Identifiants incorrects",
-      });
+      return c.json(
+        { success: false, message: "Identifiants incorrects" },
+        401,
+      );
     }
 
-    // Generate token
     const token = jwt.sign(
-      { id: admin._id, username: admin.username, role: admin.role },
-      JWT_SECRET,
-      { expiresIn: "7d" }
+      { id: admin.id, username: admin.username, role: admin.role },
+      c.env.JWT_SECRET,
+      { expiresIn: "7d" },
     );
 
-    res.json({
+    return c.json({
       success: true,
       message: "Connexion réussie",
       token,
@@ -41,26 +41,18 @@ const loginAdmin = async (req, res) => {
     });
   } catch (error) {
     console.error("Admin login error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Erreur serveur",
-    });
+    return c.json({ success: false, message: "Erreur serveur" }, 500);
   }
 };
 
-const verifyToken = async (req, res) => {
-  // req.user is set by authenticate middleware
-  res.json({
+export const verifyToken = async (c) => {
+  const user = c.get("user");
+  return c.json({
     valid: true,
     user: {
-      id: req.user.id,
-      username: req.user.username,
-      role: req.user.role,
+      id: user.id,
+      username: user.username,
+      role: user.role,
     },
   });
-};
-
-module.exports = {
-  loginAdmin,
-  verifyToken,
 };

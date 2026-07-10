@@ -1,0 +1,14 @@
+{
+  "name": "la-chirurgie-tunisie-backend",
+  "main": "app.js",
+  "compatibility_date": "2026-07-10",
+  "compatibility_flags": ["nodejs_compat"],
+  "account_id": "CHANGE_ME",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "la-chirurgie-tunisie-db",
+      "database_id": "00000000-0000-0000-0000-000000000000"
+    }
+  ]
+}
