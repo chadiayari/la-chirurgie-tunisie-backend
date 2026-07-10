@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS contacts (
   name         TEXT NOT NULL,
   phone        TEXT NOT NULL,
   intervention TEXT,
-  email        TEXT NOT NULL,
+  email        TEXT,
   message      TEXT,
   status       TEXT NOT NULL DEFAULT 'new' CHECK (status IN ('new','read','replied')),
   created_at   TEXT NOT NULL DEFAULT (datetime('now')),
